@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@ag-grid-community/styles@30.2.1/ag-grid.css" />
+
+    <title>Document</title>
+</head>
+<body>
+    <div class="bank-login">
+        <div class="container">
+            <form [formGroup]="loginForm" (ngSubmit)="onFormSubmit()" class="login-form">
+                <h3 class="text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                        class="bi bi-person-bounding-box" viewBox="0 0 16 16">
+                        <path
+                            d="M1.5 1a.5.5 0 0 0-.5.5v3a.5.5 0 0 1-1 0v-3A1.5 1.5 0 0 1 1.5 0h3a.5.5 0 0 1 0 1h-3zM11 .5a.5.5 0 0 1 .5-.5h3A1.5 1.5 0 0 1 16 1.5v3a.5.5 0 0 1-1 0v-3a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 1-.5-.5zM.5 11a.5.5 0 0 1 .5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 1 0 1h-3A1.5 1.5 0 0 1 0 14.5v-3a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v3a1.5 1.5 0 0 1-1.5 1.5h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 1 .5-.5z" />
+                        <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
+                    </svg>
+                    Login User Portal
+                </h3>
+                <hr />
+    
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" formControlName="email" class="form-control"
+                        [ngClass]="{ 'is-invalid': submitted && fval['email'].errors }" placeholder="Enter email" />
+                    <div *ngIf="submitted && fval['email'].errors" class="invalid-feedback">
+                        <div *ngIf="fval['email'].errors?.['required']">Email is required</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" formControlName="password" class="form-control"
+                        [ngClass]="{ 'is-invalid': submitted && fval['password'].errors }" placeholder="Enter password here" />
+                    <div *ngIf="submitted && fval['password'].errors" class="invalid-feedback">
+                        <div *ngIf="fval['password'].errors?.['required']">Please enter a Password</div>
+                    </div>
+                </div>
+                <hr />
+                <br />
+    
+                <div class="row">
+                    <div class="col-lg-6"> <button [disabled]="loading" class="btn btn-success full-width">
+                            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                            Login
+                        </button></div>
+                    <div class="col-lg-6">
+                        <a routerLink="/register" class="btn btn-secondary full-width">Register</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    
+    </div>
+</body>
+</html>

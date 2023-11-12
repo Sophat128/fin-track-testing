@@ -1,1 +1,31 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-alpine.css';
+
+
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+.active {
+  color: #ff9374;
+}
+
+.active-lg {
+  color: #846AD1;
+}
+
+.active-bg {
+  color: white;
+  background-color: #846AD1;
+}
+/* body {
+    font-family: "Open Sans", sans-serif;
+} */
+
+.nav-border {
+    border-bottom: 2px solid #21d192;
+    background: #fff;
+}
+

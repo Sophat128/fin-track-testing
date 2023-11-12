@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { WebPushService } from './web-push.service';
+import { LoginService } from './login.service';
 
-describe('WebPushService', () => {
-  let service: WebPushService;
+describe('LoginService', () => {
+  let service: LoginService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(WebPushService);
+    service = TestBed.inject(LoginService);
   });
 
   it('should be created', () => {

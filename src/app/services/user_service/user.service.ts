@@ -13,7 +13,7 @@ export class UserService {
   }
 
   public getUser(userId:any): Observable<any> {
-    return this.http.get(environment.baseUrl + '/bank/account/bankInfo/' + userId);
+    return this.http.get(environment.baseUrl + '/bank/bankInfo/' + userId);
   }
 
 }

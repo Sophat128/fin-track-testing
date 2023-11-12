@@ -1,53 +1,55 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { SwUpdate, SwPush } from '@angular/service-worker';
-import { WebPushService } from './services/webpush.service';
+import { WebPushService } from './services/webpush_service/webpush.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
-  providers: [WebPushService],
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit {
-  title = 'hello';
+export class AppComponent {
+  title = "KB bank"
 
   sub: PushSubscription | null = null;
   unsub: PushSubscription | null = null;
+  userId = localStorage.getItem("userId");
+  isLogin = localStorage.getItem("login");
 
   constructor(
     private swUpdate: SwUpdate,
     private swPush: SwPush,
     public webPushService: WebPushService
   ) {}
-  readonly VAPID_PUBLIC_KEY =
+  readonly VAPID_PUBLIC_KEY = 
     'BM8sBfpPla7o8yocv8HMuEWLbT7AurG20zciQfVLasrBTNPbdWW4G_6gyZdfqWkPVazJFIT3igimQRkdQZzo6fc';
 
   ngOnInit() {
     console.log(" hello");
-    
 
     const hasSubscribed = localStorage.getItem('hasSubscribed') === 'true';
-    if (!hasSubscribed) {
+    if (this.isLogin == 'true') {
+      
       this.subscribeToNotifications();
       console.log("subscribe: ", this.sub);
-      
     }
 
-    if (this.swUpdate.isEnabled) {
+    // if (this.swUpdate.isEnabled) {
 
-      console.log("loading");
-        this.swUpdate.available.subscribe(() => {
+    //   console.log("loading");
+    //     this.swUpdate.available.subscribe(() => {
 
-            if (confirm("New version available. Load New Version?")) {
-              console.log("Yes Im inside this b")
-                window.location.reload();
-            }
-        });
+    //         if (confirm("New version available. Load New Version?")) {
+    //           console.log("Yes Im inside this b")
+    //             window.location.reload();
+    //         }
+    //     });
 
-    }
+    // }
   }
 
   subscribeToNotifications() {
+    console.log("Infunction");
+    
     this.swPush
       .requestSubscription({
         serverPublicKey: this.VAPID_PUBLIC_KEY,
@@ -57,7 +59,7 @@ export class AppComponent implements OnInit {
 
         console.log('Notification Subscription: ', sub.getKey('auth'));
 
-        this.webPushService.addPushSubscriber(sub).subscribe(
+        this.webPushService.addPushSubscriber(sub, this.userId).subscribe(
           () => console.log('Sent push subscription object to server.'),
           (err) =>
             console.log(
@@ -70,4 +72,8 @@ export class AppComponent implements OnInit {
         console.error('Could not subscribe to notifications', err)
       );
   }
+
+
+
+
 }

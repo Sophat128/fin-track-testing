@@ -1,24 +1,43 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { SwPush } from '@angular/service-worker';
-import { WebPushService } from '../services/webpush.service';
+import { WebPushService } from '../services/webpush_service/webpush.service';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'lessons',
+  selector: 'app-push-notification',
   templateUrl: './webpush.component.html',
   styleUrls: ['./webpush.component.css'],
   providers: [WebPushService],
 })
-export class LessonsComponent {
+export class WebpushComponent {
   isLoggedIn$: Observable<boolean> = of(false);
   sub: PushSubscription | null = null;
   unsub: PushSubscription | null = null;
+  notificationResponse = {};
+  userId = localStorage.getItem('userId');
+  subscribed = localStorage.getItem('sub');
 
-  readonly VAPID_PUBLIC_KEY =
-    // 'BLnVk1MBGFBW4UxL44fuoM2xxQ4o9CuxocVzKn9UVmnXZEyPCTEFjI4sALMB8qN5ee67yZ6MeQWjd5iyS8lINAg';
-    'BM8sBfpPla7o8yocv8HMuEWLbT7AurG20zciQfVLasrBTNPbdWW4G_6gyZdfqWkPVazJFIT3igimQRkdQZzo6fc';
+  commonNotification = {
+    title: 'KB Bank',
+    icon: '../assets/icons/icon-72x72.png',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1,
+    },
+    actions: [
+      {
+        action: 'explore',
+        title: 'Go to the site',
+      },
+    ],
+  };
+
+  VAPID_PUBLIC_KEY = '';
+  // 'BLnVk1MBGFBW4UxL44fuoM2xxQ4o9CuxocVzKn9UVmnXZEyPCTEFjI4sALMB8qN5ee67yZ6MeQWjd5iyS8lINAg';
+  // 'BM8sBfpPla7o8yocv8HMuEWLbT7AurG20zciQfVLasrBTNPbdWW4G_6gyZdfqWkPVazJFIT3igimQRkdQZzo6fc';
 
   constructor(
     private swPush: SwPush,
@@ -26,70 +45,145 @@ export class LessonsComponent {
     private router: Router
   ) {}
 
-  
   ngOnInit() {
     this.swPush.messages.subscribe((message) => {
       // Handle the incoming push notification message
       console.log('Received push message:', message);
       this.showNotification(message);
     });
+    this.webPushService.getPublicKey().subscribe(
+      (publicKey) => {
+        let data = JSON.parse(JSON.stringify(publicKey));
+        this.VAPID_PUBLIC_KEY = data.payload;
+        // You can now use the publicKey in your component
+        console.log('My key: ', data.payload);
+      },
+      (error) => {
+        console.error('Error:', error);
+      }
+    );
   }
 
   showNotification(message: any) {
+    let data;
+    console.log('Before notification');
     if ('Notification' in window && Notification.permission === 'granted') {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
         navigator.serviceWorker.ready.then((registration) => {
-          const options = {
-            body: message.body,
-            icon: 'notification-icon.png', // Replace with the path to your notification icon
-          };
+          // Parse the JSON data received from the backend
+          console.log('message body: ', message.body);
 
-          registration.showNotification('Push Notification', options);
+          try {
+            data = JSON.parse(message.body);
+            data = JSON.parse(data);
+          } catch (error) {
+            console.error('Error parsing JSON data:', error);
+            data = {}; // Provide an empty object as a default
+          }
+
+          switch (data.action) {
+            case 'WITHDRAW':
+              this.notificationResponse = {
+                ...this.commonNotification,
+                body: `Cash withdrawal of $${data.amount} from your saving account`,
+              };
+              break;
+            case 'DEPOSIT':
+              this.notificationResponse = {
+                ...this.commonNotification,
+                body: `You have deposited $${data.amount} to your saving account`,
+              };
+              break;
+            case 'RECEIVER':
+              this.notificationResponse = {
+                ...this.commonNotification,
+                body: `You have received $${data.amount} from ${data.accountNumber} account`,
+              };
+              break;
+            case 'SENDER':
+              this.notificationResponse = {
+                ...this.commonNotification,
+                body: `You have transferred $${data.amount} to ${data.accountNumber} account`,
+              };
+              break;
+            default:
+              // Handle other cases or provide a default notificationResponse
+              break;
+          }
+
+          registration.showNotification('KB Bank', this.notificationResponse);
         });
       }
 
-     console.log('Receive message: ', message);
+      console.log('Receive message: ', message);
     }
   }
 
   subscribeToNotifications() {
-    this.swPush
-      .requestSubscription({
-        serverPublicKey: this.VAPID_PUBLIC_KEY,
-      })
-      .then((sub) => {
-        this.sub = sub;
+    console.log('subscribed: ', this.subscribed);
 
-        console.log('Notification Subscription: ', sub.getKey('auth'));
-
-        this.webPushService.addPushSubscriber(sub).subscribe(
-          () => console.log('Sent push subscription object to server.'),
-          (err) =>
-            console.log(
-              'Could not send subscription object to server, reason: ',
-              err
-            )
-        );
-      })
-      .catch((err) =>
-        console.error('Could not subscribe to notifications', err)
+    if (this.subscribed == 'false' || this.subscribed == null) {
+      this.webPushService.getPublicKey().subscribe(
+        (publicKey) => {
+          let data = JSON.parse(JSON.stringify(publicKey));
+          this.VAPID_PUBLIC_KEY = data.payload;
+          // You can now use the publicKey in your component
+          console.log('My key: ', data.payload);
+        },
+        (error) => {
+          console.error('Error:', error);
+        }
       );
+      this.swPush
+        .requestSubscription({
+          serverPublicKey: this.VAPID_PUBLIC_KEY,
+        })
+        .then((sub) => {
+          console.log('Notification Subscription: ', sub.getKey('auth'));
+          console.log('Notification p256dh: ', sub.getKey('p256dh'));
+          console.log('Notification userId: ', this.userId);
+
+
+          this.webPushService.addPushSubscriber(sub, this.userId).subscribe(
+            () => {
+              this.sub = sub;
+              localStorage.setItem('sub', 'true');
+              console.log('Sent push subscription object to server.');
+            },
+            (err) =>
+              console.log(
+                'Could not send subscription object to server, reason: ',
+                err
+              )
+          );
+        })
+        .catch((err) =>
+          console.error('Could not subscribe to notifications', err)
+        );
+    } else {
+      console.log('You already have a subscription');
+    }
   }
 
   unsubscribe() {
     const self = this;
-
     navigator.serviceWorker.ready.then(function (registration) {
       registration.pushManager.getSubscription().then(function (subscription) {
         console.log('log ', subscription);
 
         if (subscription) {
-          self.unsub = subscription;
-          self.sub = null;
           subscription.unsubscribe().then(function (success) {
             if (success) {
-              self.webPushService.unsubscribe(subscription).subscribe(
-                () => console.log('Sent push subscription object to server.'),
+              const originalUrl = subscription.endpoint;
+              const substringToRemove = 'https://fcm.googleapis.com/fcm/send/';
+              const modifiedUrl = originalUrl.replace(substringToRemove, '');
+              self.webPushService.unsubscribe(modifiedUrl).subscribe(
+                () => {
+                  self.unsub = subscription;
+                  self.sub = null;
+                  localStorage.setItem('sub', 'false');
+                  console.log('Sent push subscription object to server.');
+                },
                 (err) =>
                   console.log(
                     'Could not send subscription object to server, reason: ',
@@ -115,17 +209,15 @@ export class LessonsComponent {
     this.webPushService.send(notificationPayload).subscribe();
   }
 
-  sendToSpecificUser(){
+  sendToSpecificUser() {
     console.log('Sending Newsletter to all Subscribers ...');
     const notificationPayload = {
       title: 'Hello',
       body: 'How are you?',
     };
 
-    this.webPushService.sendToSpecificUser(notificationPayload).subscribe();
-  }
-
-  link(id: number) {
-    this.router.navigate(['/lessons', id]);
+    this.webPushService
+      .sendToSpecificUser(notificationPayload, this.userId)
+      .subscribe();
   }
 }

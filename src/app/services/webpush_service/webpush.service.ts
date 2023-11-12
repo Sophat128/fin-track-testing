@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn:'root'
 })
 export class WebPushService {
   constructor(private http: HttpClient) {}
@@ -11,13 +11,13 @@ export class WebPushService {
     return this.http.get('http://localhost:8084/api/v1/webpush/publicKey');
   }
 
-  addPushSubscriber(sub: any) {
+  addPushSubscriber(sub: any, userId:string|null) {
     // return this.http.post('http://localhost:9000/api/notifications', sub);
-    return this.http.post('http://localhost:8084/api/v1/webpush/subscribe', sub);
+    return this.http.post('http://localhost:8084/api/v1/webpush/subscribe/' + userId, sub);
   }
-  unsubscribe(sub: any) {
+  unsubscribe(endpoint: string) {
     // return this.http.post('http://localhost:9000/api/notifications', sub);
-    return this.http.post('http://localhost:8084/api/v1/webpush/unsubscribe', sub);
+    return this.http.delete('http://localhost:8084/api/v1/webpush/unsubscribe/' + endpoint);
   }
 
   send(notification: any) {
@@ -28,9 +28,9 @@ export class WebPushService {
     );
 
   }
-  sendToSpecificUser(notification: any) {
+  sendToSpecificUser(notification: any, userId:string|null) {
     return this.http.post(
-      'http://localhost:8084/api/v1/webpush/send_notification_user',
+      'http://localhost:8084/api/v1/webpush/send_notification_user/' + userId,
       notification
     );
 
