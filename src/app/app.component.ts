@@ -48,6 +48,7 @@ export class AppComponent {
   }
 
   subscribeToNotifications() {
+    
     console.log("Infunction");
     
     this.swPush
