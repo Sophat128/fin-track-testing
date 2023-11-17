@@ -4,6 +4,7 @@ import { TransferhistoryService } from '../services/transfer_service/transfer-hi
 
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef } from 'ag-grid-community';
+import { TransactionService } from '../transaction.service';
 
 @Component({
   selector: 'app-transfer-history',
@@ -12,10 +13,11 @@ import { ColDef } from 'ag-grid-community';
 })
 export class TransferHistoryComponent implements OnInit {
 
-  private accNo = localStorage.getItem("savingAccNo");
+  userId = localStorage.getItem("userId");
+  savingAccNo =localStorage.getItem("savingAccNo")
   public transferList: Array<TransferHistory> = [];
   public columnDefs: ColDef[] = [
-    { field: "date" }, { field: "id" }, { field: "amount" }, { field: "saccount",  headerName:"Savings A/C No" }, { field: "raccount" , headerName:"Primary A/C No"}
+    { field: "date" }, { field: "id" }, { field: "amount" }, { field: "savingAccount",  headerName:"Savings A/C No" }, { field: "receiverAccount" , headerName:"Primary A/C No"}
   ];
   public defaultColDef: ColDef = {
     sortable: true,
@@ -23,12 +25,26 @@ export class TransferHistoryComponent implements OnInit {
   };
 
 
-  constructor(private transferService: TransferhistoryService) { }
+  constructor(private transactionService: TransactionService) { }
 
   ngOnInit(): void {
-    this.transferService.getTransferHistory(this.accNo).subscribe(res => {
-      this.transferList = res;
+
+    this.transactionService.getTransactions(this.savingAccNo).subscribe((res: any) => {
+      const dataList: Array<TransferHistory> = [];
+      res.payload.map((transaction: any) => {
+        if(transaction.type == "TRANSFER" && transaction.statementType == "EXPENSE"){
+          console.log("Date: ", transaction.createdAt);
+          
+          const data = new TransferHistory(transaction.id,transaction.bankAccountNumber, transaction.receivedAccountNumber,transaction.amount,new Date(transaction.createdAt).toLocaleString());
+          console.log("Data transaction: ", data);
+          
+          dataList.push(data);
+
+        }
+      })
+      this.transferList = dataList;
     });
+
   }
 
 }

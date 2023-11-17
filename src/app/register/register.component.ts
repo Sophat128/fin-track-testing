@@ -1,10 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { User } from '../models';
 import { RegisterService } from '../register.service';
 import { AuthService } from '../auth.service';
 import Swal from 'sweetalert2';
+import { BankService } from '../services/bank_service/bank.service';
 
 @Component({
   selector: 'app-register',
@@ -15,7 +22,8 @@ export class RegisterComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private registerService: RegisterService,
-    private authService :AuthService
+    private authService: AuthService,
+    private bankService: BankService
   ) {}
   identityType = [
     { name: 'Aadhar Card', value: 'aadhar' },
@@ -28,23 +36,33 @@ export class RegisterComponent implements OnInit {
   submitted = false;
   selectedOption: string = '';
   ngOnInit() {
-  let randomNumber = Math.floor(100000 + Math.random() * 900000);
-  let randomAccountNumber = String(randomNumber).padStart(10, '0');
+    let randomNumber = Math.floor(100000 + Math.random() * 900000);
+    let randomAccountNumber = String(randomNumber).padStart(10, '0');
     this.authService.setRegisterPageStatus(true);
     this.registerForm = this.formBuilder.group({
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       userName: ['', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
       phone: ['', Validators.required],
-      accountNumber: [randomAccountNumber, [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      balance: 0,
+      accountNumber: [
+        randomAccountNumber,
+        [Validators.required, Validators.pattern(/^\d{10}$/)],
+      ],
+      balance: [0, [Validators.required, this.validateMinBalance]],
       email: ['', [Validators.required, Validators.email]],
     });
   }
 
   get fval() {
     return this.registerForm.controls;
+  }
+  validateMinBalance(control: AbstractControl): ValidationErrors | null {
+    const balance = control.value;
+    if (balance !== null && balance < 5) {
+      return { minBalance: true };
+    }
+    return null;
   }
 
   onFormSubmit() {
@@ -62,25 +80,35 @@ export class RegisterComponent implements OnInit {
 
     this.registerService
       .insertUser(
+        result.userName,
         result.firstName,
         result.lastName,
-        result.userName,
-        result.password,
         result.phone,
-        result.accountNumber,
-        result.balance,
-        result.email
+        result.email,
+        result.password
       )
       .subscribe((data: any) => {
+        console.log('Data: ', data.payload);
+
         this.loading = false;
         localStorage.clear();
-        localStorage.setItem('user', JSON.stringify(data));
-        if (data.registrationStatus) {
+        localStorage.setItem('user', JSON.stringify(data.payload));
+        // this.bankService.createBankAccount(data.payload.id, result.accountNumber, result.balance)
+        if (data.status == 200) {
           Swal.fire({
             icon: 'success',
             title: 'User registered succesfully!',
             text: 'Please wait for an email for account activation!',
           });
+          this.bankService
+            .createBankAccount(
+              data.payload.id,
+              result.accountNumber,
+              result.balance
+            )
+            .subscribe(() => {
+              console.log("It's working");
+            });
         } else {
           Swal.fire({
             icon: 'error',

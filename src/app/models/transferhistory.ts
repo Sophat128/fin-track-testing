@@ -1,7 +1,15 @@
 export class TransferHistory{
     id!:number;
-    saccount!:string;
-    raccount!:string;
+    savingAccount!:string;
+    receiverAccount!:string;
     amount!:number;
-    date!:Date;
+    date!:string;
+
+    constructor(id: number, savingAccount: string, receiverAccount: string, amount: number, date: string) {
+        this.id = id;
+        this.savingAccount = savingAccount;
+        this.receiverAccount = receiverAccount;
+        this.amount = amount;
+        this.date = date;
+    }
 }

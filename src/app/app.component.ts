@@ -5,59 +5,56 @@ import { WebPushService } from './services/webpush_service/webpush.service';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = "KB bank"
-
+  title = 'KB bank';
   sub: PushSubscription | null = null;
-  unsub: PushSubscription | null = null;
-  userId = localStorage.getItem("userId");
-  isLogin = localStorage.getItem("login");
+  userId = localStorage.getItem('userId');
+  isLogin = localStorage.getItem('login');
 
   constructor(
     private swUpdate: SwUpdate,
     private swPush: SwPush,
     public webPushService: WebPushService
   ) {}
-  readonly VAPID_PUBLIC_KEY = 
-    'BM8sBfpPla7o8yocv8HMuEWLbT7AurG20zciQfVLasrBTNPbdWW4G_6gyZdfqWkPVazJFIT3igimQRkdQZzo6fc';
+
+  VAPID_PUBLIC_KEY = '';
+    
 
   ngOnInit() {
-    console.log(" hello");
+    console.log('Hello');
+    this.webPushService.getPublicKey().subscribe(
+      (publicKey) => {
+        let data = JSON.parse(JSON.stringify(publicKey));
+        this.VAPID_PUBLIC_KEY = data.payload;
+        // You can now use the publicKey in your component
+        console.log('My key: ', data.payload);
+      },
+      (error) => {
+        console.error('Error:', error);
+      }
+    );
 
-    const hasSubscribed = localStorage.getItem('hasSubscribed') === 'true';
-    if (this.isLogin == 'true') {
-      
+    if (this.isLogin === 'true' && !this.hasSubscribedBefore()) {
       this.subscribeToNotifications();
-      console.log("subscribe: ", this.sub);
+      this.setHasSubscribed();
     }
-
-    // if (this.swUpdate.isEnabled) {
-
-    //   console.log("loading");
-    //     this.swUpdate.available.subscribe(() => {
-
-    //         if (confirm("New version available. Load New Version?")) {
-    //           console.log("Yes Im inside this b")
-    //             window.location.reload();
-    //         }
-    //     });
-
-    // }
+  }
+  hasSubscribedBefore() {
+    const hasSubscribed = localStorage.getItem('hasSubscribed') === 'true';
+    return hasSubscribed;
+  }
+  setHasSubscribed() {
+    localStorage.setItem('hasSubscribed', 'true');
   }
 
   subscribeToNotifications() {
-    
-    console.log("Infunction");
-    
     this.swPush
       .requestSubscription({
         serverPublicKey: this.VAPID_PUBLIC_KEY,
       })
       .then((sub) => {
-        localStorage.setItem('hasSubscribed', 'true');
-
         console.log('Notification Subscription: ', sub.getKey('auth'));
 
         this.webPushService.addPushSubscriber(sub, this.userId).subscribe(
@@ -73,8 +70,4 @@ export class AppComponent {
         console.error('Could not subscribe to notifications', err)
       );
   }
-
-
-
-
 }

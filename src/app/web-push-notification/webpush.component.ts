@@ -65,23 +65,15 @@ export class WebpushComponent {
   }
 
   showNotification(message: any) {
-    let data;
     console.log('Before notification');
     if ('Notification' in window && Notification.permission === 'granted') {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
         navigator.serviceWorker.ready.then((registration) => {
           // Parse the JSON data received from the backend
           console.log('message body: ', message.body);
+          let data = message.body;
 
-          try {
-            data = JSON.parse(message.body);
-            data = JSON.parse(data);
-          } catch (error) {
-            console.error('Error parsing JSON data:', error);
-            data = {}; // Provide an empty object as a default
-          }
-
-          switch (data.action) {
+          switch (data.type) {
             case 'WITHDRAW':
               this.notificationResponse = {
                 ...this.commonNotification,
@@ -95,15 +87,19 @@ export class WebpushComponent {
               };
               break;
             case 'RECEIVER':
+              console.log("Im a receiver");
+
               this.notificationResponse = {
                 ...this.commonNotification,
-                body: `You have received $${data.amount} from ${data.accountNumber} account`,
+                body: `You have received $${data.amount} from ${data.receivedAccountNumber} account`,
               };
               break;
             case 'SENDER':
+              console.log("Im a sender");
+              
               this.notificationResponse = {
                 ...this.commonNotification,
-                body: `You have transferred $${data.amount} to ${data.accountNumber} account`,
+                body: `You have transferred $${data.amount} to ${data.receivedAccountNumber} account`,
               };
               break;
             default:

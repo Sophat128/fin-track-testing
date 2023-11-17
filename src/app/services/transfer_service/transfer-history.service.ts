@@ -12,6 +12,7 @@ export class TransferhistoryService {
   // private url: String;
 
   constructor(private http: HttpClient) { }
+  
   public getTransferHistory(accNo:any): Observable<TransferHistory[]> {
     return this.http.get<TransferHistory[]>(
       environment.baseUrl+ '/account/getTransfers/' + accNo

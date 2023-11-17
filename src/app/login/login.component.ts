@@ -49,6 +49,8 @@ export class LoginComponent implements OnInit {
 
     this.loginService.loginUser(result).subscribe({
       next: (res) => {
+        console.log("Loggin data: ", res);
+        
         localStorage.setItem('token', res.loginResponse.access_token);
         localStorage.setItem('refresh_token', res.loginResponse.refresh_token);
         this.loginForm.reset();
@@ -86,10 +88,12 @@ export class LoginComponent implements OnInit {
         // this._router.navigate(['/beginning']);
       },
       error: (err) => {
+        console.log("Error: ", err);
+        
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: err,
+          text: err.error,
         });
         this.authService.authenticate(false);
         this.loading = false;

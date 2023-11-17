@@ -4,6 +4,7 @@ import { Transaction } from '../models/transaction';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import { ColDef } from 'ag-grid-community';
+import { DatePipe } from '@angular/common';
 
 
 @Component({
@@ -13,7 +14,7 @@ import { ColDef } from 'ag-grid-community';
 })
 export class TransactionHistoryComponent implements OnInit {
 
-  username = localStorage.getItem("username");
+  userId = localStorage.getItem("userId");
   savingAccNo =localStorage.getItem("savingAccNo")
   public savingBalance: number = 0;
 
@@ -33,15 +34,30 @@ export class TransactionHistoryComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.transactionService.getTransactions(this.savingAccNo).subscribe((res: Transaction[]) => {
-      this.transactionList = res;
+    this.transactionService.getTransactions(this.savingAccNo).subscribe((res: any) => {
+      const dataList: Array<Transaction> = [];
+      res.payload.map((transaction: any) => {
+        if(transaction.type != "TRANSFER"){
+          console.log("Date: ", transaction.createdAt);
+          
+          const data = new Transaction(new Date(transaction.createdAt).toLocaleString() ,transaction.id, transaction.type, transaction.amount)
+          console.log("Data transaction: ", data);
+          
+          dataList.push(data);
+
+        }
+      })
+      this.transactionList = dataList;
     });
 
-    this.transactionService.getSavingAccount(this.username).subscribe(res => {
-      this.savingBalance = res.balance;
+    this.transactionService.getUserInfo(this.userId).subscribe(res => {
+      this.savingBalance = res.currentBalance;
     });
-
   }
+
+  
+
+  
 
 
 }

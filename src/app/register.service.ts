@@ -11,24 +11,20 @@ export class RegisterService {
   constructor(private http: HttpClient) { }
 
   insertUser(
+    userName: string,
     firstName: string,
     lastName: string,
-    userName: string,
-    password: string,
-    phone: string,
-    accountNumber: string,
-    balance: number,
-    email: string
+    phoneNumber: string,
+    email: string,
+    password: string
   ) {
     const body = {
-      fname: firstName,
-      lname: lastName,
       username: userName,
-      password: password,
-      phone: phone,
-      accountNumber: accountNumber,
-      balance: balance,
+      firstName: firstName,
+      lastName: lastName,
       email: email,
+      phoneNumber: phoneNumber,
+      password: password
     };
 
 

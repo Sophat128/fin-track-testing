@@ -18,9 +18,8 @@ export class TransactionService {
   public getTransactions(accNo:any): Observable<any> {
     return this.http.get(environment.baseUrl  + '/transaction/history/' + accNo);
   }
-  public getSavingAccount(username:any): Observable<SavingAccount> {
-    return this.http.get<SavingAccount>(
-      environment.baseUrl + '/account/getsaving/' + username
-    );
+  
+  public getUserInfo(userId:any): Observable<any> {
+    return this.http.get(environment.baseUrl + '/bank/bankInfo/' + userId);
   }
 }

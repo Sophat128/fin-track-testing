@@ -87,7 +87,11 @@
         <br>
         <hr />
         <br>
-        <button class="btn btn-primary">Register</button>
+          <button [disabled]="loading" class="btn btn-primary" class="btn btn-info">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+            <!-- <a (click)="withdraw()" style="color: rgb(255, 255, 255)">Withdraw</a> -->
+            Register
+          </button>
       </form>
     </div>
   </div>
