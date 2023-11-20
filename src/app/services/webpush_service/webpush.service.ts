@@ -8,7 +8,7 @@ export class WebPushService {
   constructor(private http: HttpClient) {}
 
   getPublicKey(){
-    return this.http.get('http://localhost:8084/api/v1/webpush/publicKey');
+    return this.http.get('http://localhost:8084/api/v1/webpush/vapidKeys');
   }
 
   addPushSubscriber(sub: any, userId:string|null) {

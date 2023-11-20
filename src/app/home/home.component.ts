@@ -40,8 +40,8 @@ export class HomeComponent implements OnInit {
 
     this.userService.getUser(this.userId).subscribe(res => {
       console.log("res: ", res);
-      this.savingAcc = res.bankAccountNumber;
-      this.savingBalanceLocal = res.currentBalance;
+      this.savingAcc = res.payload.bankAccountNumber;
+      this.savingBalanceLocal = res.payload.currentBalance;
       localStorage.setItem("savingAccNo", this.savingAcc);
     });
 

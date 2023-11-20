@@ -54,9 +54,9 @@ export class WebpushComponent {
     this.webPushService.getPublicKey().subscribe(
       (publicKey) => {
         let data = JSON.parse(JSON.stringify(publicKey));
-        this.VAPID_PUBLIC_KEY = data.payload;
+        this.VAPID_PUBLIC_KEY = data.payload.publicKey;
         // You can now use the publicKey in your component
-        console.log('My key: ', data.payload);
+        console.log('My key: ', data.payload.publicKey);
       },
       (error) => {
         console.error('Error:', error);
@@ -71,6 +71,7 @@ export class WebpushComponent {
         navigator.serviceWorker.ready.then((registration) => {
           // Parse the JSON data received from the backend
           console.log('message body: ', message.body);
+          
           if (message.body == undefined) {
             this.notificationResponse = {
               ...this.commonNotification,
