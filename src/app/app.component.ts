@@ -27,7 +27,7 @@ export class AppComponent {
     this.webPushService.getPublicKey().subscribe(
       (publicKey) => {
         let data = JSON.parse(JSON.stringify(publicKey));
-        this.VAPID_PUBLIC_KEY = data.payload;
+        this.VAPID_PUBLIC_KEY = data.payload.publicKey;
         // You can now use the publicKey in your component
         console.log('My key: ', data.payload);
       },
