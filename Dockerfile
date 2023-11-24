@@ -14,7 +14,7 @@ RUN npm install --force
 COPY . .
 
 # Build the Angular application
-RUN npm run build
+RUN npm run build 
 
 # Use a lightweight, NGINX-based image for serving the Angular application
 FROM nginx:alpine
