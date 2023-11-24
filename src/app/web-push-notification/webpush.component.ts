@@ -54,9 +54,9 @@ export class WebpushComponent {
     this.webPushService.getPublicKey().subscribe(
       (publicKey) => {
         let data = JSON.parse(JSON.stringify(publicKey));
-        this.VAPID_PUBLIC_KEY = data.payload;
+        this.VAPID_PUBLIC_KEY = data.payload.publicKey;
         // You can now use the publicKey in your component
-        console.log('My key: ', data.payload);
+        console.log('My key: ', data.payload.publicKey);
       },
       (error) => {
         console.error('Error:', error);
@@ -71,43 +71,54 @@ export class WebpushComponent {
         navigator.serviceWorker.ready.then((registration) => {
           // Parse the JSON data received from the backend
           console.log('message body: ', message.body);
-          let data = message.body;
+          
+          if (message.body == undefined) {
+            this.notificationResponse = {
+              ...this.commonNotification,
+              body: message.message,
+            };
+            console.log('Default working');
 
-          switch (data.type) {
-            case 'WITHDRAW':
-              this.notificationResponse = {
-                ...this.commonNotification,
-                body: `Cash withdrawal of $${data.amount} from your saving account`,
-              };
-              break;
-            case 'DEPOSIT':
-              this.notificationResponse = {
-                ...this.commonNotification,
-                body: `You have deposited $${data.amount} to your saving account`,
-              };
-              break;
-            case 'RECEIVER':
-              console.log("Im a receiver");
-
-              this.notificationResponse = {
-                ...this.commonNotification,
-                body: `You have received $${data.amount} from ${data.receivedAccountNumber} account`,
-              };
-              break;
-            case 'SENDER':
-              console.log("Im a sender");
-              
-              this.notificationResponse = {
-                ...this.commonNotification,
-                body: `You have transferred $${data.amount} to ${data.receivedAccountNumber} account`,
-              };
-              break;
-            default:
-              // Handle other cases or provide a default notificationResponse
-              break;
+            registration.showNotification('KB Bank', this.notificationResponse);
           }
+          let data = message.body;
+          if (message.body != undefined) {
+            switch (data.type) {
+              case 'WITHDRAW':
+                this.notificationResponse = {
+                  ...this.commonNotification,
+                  body: `Cash withdrawal of $${data.amount} from your saving account`,
+                };
+                break;
+              case 'DEPOSIT':
+                this.notificationResponse = {
+                  ...this.commonNotification,
+                  body: `You have deposited $${data.amount} to your saving account`,
+                };
+                break;
+              case 'RECEIVER':
+                console.log('Im a receiver');
 
-          registration.showNotification('KB Bank', this.notificationResponse);
+                this.notificationResponse = {
+                  ...this.commonNotification,
+                  body: `You have received $${data.amount} from ${data.receivedAccountNumber} account`,
+                };
+                break;
+              case 'SENDER':
+                console.log('Im a sender');
+
+                this.notificationResponse = {
+                  ...this.commonNotification,
+                  body: `You have transferred $${data.amount} to ${data.receivedAccountNumber} account`,
+                };
+                break;
+              default:
+                // Handle other cases or provide a default notificationResponse
+                break;
+            }
+
+            registration.showNotification('KB Bank', this.notificationResponse);
+          }
         });
       }
 
@@ -138,7 +149,6 @@ export class WebpushComponent {
           console.log('Notification Subscription: ', sub.getKey('auth'));
           console.log('Notification p256dh: ', sub.getKey('p256dh'));
           console.log('Notification userId: ', this.userId);
-
 
           this.webPushService.addPushSubscriber(sub, this.userId).subscribe(
             () => {
