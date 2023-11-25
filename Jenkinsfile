@@ -107,26 +107,26 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
-            steps {
-                script {
-                    try {
-                        def buildNumber = currentBuild.number
-                        def imageTag = "${IMAGE_NAME}:${buildNumber}"
-                        def containerName = "${CONTAINER_NAME}_${BUILD_INFO}"
+        // stage('Deploy') {
+        //     steps {
+        //         script {
+        //             try {
+        //                 def buildNumber = currentBuild.number
+        //                 def imageTag = "${IMAGE_NAME}:${buildNumber}"
+        //                 def containerName = "${CONTAINER_NAME}_${BUILD_INFO}"
                         
-                        sh "docker run -d -p 9001:80 --name ${containerName} ${DOCKER_REGISTRY}/${imageTag}"
+        //                 sh "docker run -d -p 9001:80 --name ${containerName} ${DOCKER_REGISTRY}/${imageTag}"
                         
-                        // Notify about successful deployment
-                        sendTelegramMessage("✅ Deployment completed for ${imageTag}\nContainer: ${containerName}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
-                    } catch (Exception e) {
-                        currentBuild.result = 'FAILURE'
-                        sendTelegramMessage("❌ Deployment failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
-                        error("Deployment failed: ${e.message}")
-                    }
-                }
-            }
-        }
+        //                 // Notify about successful deployment
+        //                 sendTelegramMessage("✅ Deployment completed for ${imageTag}\nContainer: ${containerName}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+        //             } catch (Exception e) {
+        //                 currentBuild.result = 'FAILURE'
+        //                 sendTelegramMessage("❌ Deployment failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+        //                 error("Deployment failed: ${e.message}")
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     post {
