@@ -8,7 +8,7 @@ pipeline {
     }
     environment {
         DOCKER_REGISTRY = 'kimheang68'
-        IMAGE_NAME = 'ui-fintrack-testing'
+        IMAGE_NAME = 'fintrack-ui-testing'
         CONTAINER_NAME = 'angular-fintrack-testing-container'
         TELEGRAM_BOT_TOKEN = credentials('telegram-token')
         TELEGRAM_CHAT_ID = credentials('chat-id')
@@ -107,33 +107,12 @@ pipeline {
                 }
             }
         }
-        // stage('Deploy') {
-        //     steps {
-        //         script {
-        //             try {
-        //                 def buildNumber = currentBuild.number
-        //                 def imageTag = "${IMAGE_NAME}:${buildNumber}"
-        //                 def containerName = "${CONTAINER_NAME}_${BUILD_INFO}"
-                        
-        //                 sh "docker run -d -p 9001:80 --name ${containerName} ${DOCKER_REGISTRY}/${imageTag}"
-                        
-        //                 // Notify about successful deployment
-        //                 sendTelegramMessage("✅ Deployment completed for ${imageTag}\nContainer: ${containerName}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
-        //             } catch (Exception e) {
-        //                 currentBuild.result = 'FAILURE'
-        //                 sendTelegramMessage("❌ Deployment failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
-        //                 error("Deployment failed: ${e.message}")
-        //             }
-        //         }
-        //     }
-        // }
-
 
         stage('Trigger ManifestUpdate') {
             steps {
                 script {
                     try {
-                        build job: 'ui-fintrack-testing-pipeline-2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                        build job: 'fintrack-ui-testing-pipeline-2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
                     } catch (Exception e) {
                         currentBuild.result = 'FAILURE'
                         sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
