@@ -127,6 +127,22 @@ pipeline {
         //         }
         //     }
         // }
+
+
+        stage('Trigger ManifestUpdate') {
+            steps {
+                script {
+                    try {
+                        build job: 'ui-fintrack-testing-pipeline-2', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        sendTelegramMessage("❌ Trigger ManifestUpdate stage failed: ${e.message}\nVersion: ${BUILD_INFO}\nCommitter: ${COMMITTER}\nBranch: ${BRANCH}")
+                        error("Trigger ManifestUpdate stage failed: ${e.message}")
+                    }
+                }
+            }
+        }
+
     }
 
     post {
