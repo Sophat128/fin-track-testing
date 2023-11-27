@@ -8,16 +8,16 @@ export class WebPushService {
   constructor(private http: HttpClient) {}
 
   getPublicKey(){
-    return this.http.get('https://api-fintrack.kbaenak.tech/fintrack-web-push-service/fintrack-web-push-service/api/v1/webpush/vapidKeys');
+    return this.http.get('https://api-fintrack.kbaenak.tech/fintrack-web-push-service/api/v1/webpush/vapidKeys');
   }
 
   addPushSubscriber(sub: any, userId:string|null) {
     // return this.http.post('http://localhost:9000/api/notifications', sub);
-    return this.http.post('https://api-fintrack.kbaenak.tech/fintrack-web-push-service/fintrack-web-push-service/api/v1/webpush/subscribe/' + userId, sub);
+    return this.http.post('https://api-fintrack.kbaenak.tech/fintrack-web-push-service/api/v1/webpush/subscribe/' + userId, sub);
   }
   unsubscribe(endpoint: string) {
     // return this.http.post('http://localhost:9000/api/notifications', sub);
-    return this.http.delete('https://api-fintrack.kbaenak.tech/fintrack-web-push-service/fintrack-web-push-service/api/v1/webpush/unsubscribe/' + endpoint);
+    return this.http.delete('https://api-fintrack.kbaenak.tech/fintrack-web-push-service/api/v1/webpush/unsubscribe/' + endpoint);
   }
 
   send(notification: any) {
