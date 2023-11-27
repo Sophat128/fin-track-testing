@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseUrl: 'https://api-fintrack.kbaenak.tech/fintrack-client-event-service/api/v1'
+  baseUrl: 'https://api-fintrack.kbaenak.tech/fintrack-client-event-service/fintrack-client-event-service/api/v1'
   // baseUrl: 'http://localhost:8088/fintrack-client-event-service/api/v1'
 
 };
