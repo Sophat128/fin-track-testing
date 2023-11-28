@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { UserDisplay } from '../../models/userdisplay';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment'
 
@@ -13,7 +13,11 @@ export class UserService {
   }
 
   public getUser(userId:any): Observable<any> {
-    return this.http.get(environment.baseUrl + '/bank/bankInfo/' + userId);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+    });
+    return this.http.get(environment.baseUrl + '/bank/bankInfo/' + userId, { headers: headers });
   }
 
 }

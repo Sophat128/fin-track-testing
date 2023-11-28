@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Transaction } from './models/transaction';
 import { SavingAccount } from './models/savingaccount';
 import { environment } from 'src/environments/environment';
@@ -16,10 +16,18 @@ export class TransactionService {
    
   }
   public getTransactions(accNo:any): Observable<any> {
-    return this.http.get(environment.baseUrl  + '/transaction/history/' + accNo);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+    });
+    return this.http.get(environment.baseUrl  + '/transaction/history/' + accNo, { headers: headers });
   }
   
   public getUserInfo(userId:any): Observable<any> {
-    return this.http.get(environment.baseUrl + '/bank/bankInfo/' + userId);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+    });
+    return this.http.get(environment.baseUrl + '/bank/bankInfo/' + userId, { headers: headers });
   }
 }
