@@ -4,6 +4,7 @@ import { SwPush } from '@angular/service-worker';
 import { WebPushService } from '../services/webpush_service/webpush.service';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-push-notification',
@@ -158,13 +159,26 @@ export class WebpushComponent {
             () => {
               this.sub = sub;
               localStorage.setItem('sub', 'true');
+              Swal.fire({
+                icon: 'success',
+                title: 'Subscribe successfully',
+                showConfirmButton: false,
+                timer: 2000,
+              });
               console.log('Sent push subscription object to server.');
             },
-            (err) =>
+            (err) => {
               console.log(
                 'Could not send subscription object to server, reason: ',
                 err
               )
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: err.error,
+              });
+
+            }
           );
         })
         .catch((err) =>
@@ -192,13 +206,27 @@ export class WebpushComponent {
                   self.unsub = subscription;
                   self.sub = null;
                   localStorage.setItem('sub', 'false');
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Unsubscribe successfully',
+                    showConfirmButton: false,
+                    timer: 2000,
+                  });
                   console.log('Sent push subscription object to server.');
                 },
-                (err) =>
+                (err) => {
                   console.log(
                     'Could not send subscription object to server, reason: ',
                     err
                   )
+
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: err.error,
+                  });
+
+                }
               );
 
               console.log('Unsubscribed successfully');
