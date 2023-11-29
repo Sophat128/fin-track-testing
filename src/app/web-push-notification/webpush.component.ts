@@ -117,7 +117,11 @@ export class WebpushComponent {
                 break;
             }
 
+            console.log("Before notification");
+            
             registration.showNotification('KB Bank', this.notificationResponse);
+            console.log("After notification");
+
           }
         });
       }
