@@ -4,6 +4,7 @@ import { SwPush } from '@angular/service-worker';
 import { WebPushService } from '../services/webpush_service/webpush.service';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-push-notification',
@@ -71,7 +72,7 @@ export class WebpushComponent {
         navigator.serviceWorker.ready.then((registration) => {
           // Parse the JSON data received from the backend
           console.log('message body: ', message.body);
-          
+
           if (message.body == undefined) {
             this.notificationResponse = {
               ...this.commonNotification,
@@ -128,7 +129,13 @@ export class WebpushComponent {
 
   subscribeToNotifications() {
     console.log('subscribed: ', this.subscribed);
-
+    if(this.subscribed == 'true') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: "You have subscribed already!!!",
+      });
+    }
     if (this.subscribed == 'false' || this.subscribed == null) {
       this.webPushService.getPublicKey().subscribe(
         (publicKey) => {
@@ -154,13 +161,26 @@ export class WebpushComponent {
             () => {
               this.sub = sub;
               localStorage.setItem('sub', 'true');
+              Swal.fire({
+                icon: 'success',
+                title: 'Subscribe successfully',
+                showConfirmButton: false,
+                timer: 2000,
+              });
               console.log('Sent push subscription object to server.');
             },
-            (err) =>
+            (err) => {
               console.log(
                 'Could not send subscription object to server, reason: ',
                 err
-              )
+              );
+
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: err.error,
+              });
+            }
           );
         })
         .catch((err) =>
@@ -172,6 +192,15 @@ export class WebpushComponent {
   }
 
   unsubscribe() {
+
+    if(this.subscribed == 'false') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: "You have not subscribed yet!!!",
+      });
+    }
+
     const self = this;
     navigator.serviceWorker.ready.then(function (registration) {
       registration.pushManager.getSubscription().then(function (subscription) {
@@ -188,13 +217,25 @@ export class WebpushComponent {
                   self.unsub = subscription;
                   self.sub = null;
                   localStorage.setItem('sub', 'false');
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Unsubscribe successfully',
+                    showConfirmButton: false,
+                    timer: 2000,
+                  });
                   console.log('Sent push subscription object to server.');
                 },
-                (err) =>
+                (err) => {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: err.error,
+                  });
                   console.log(
                     'Could not send subscription object to server, reason: ',
                     err
-                  )
+                  );
+                }
               );
 
               console.log('Unsubscribed successfully');
@@ -205,25 +246,25 @@ export class WebpushComponent {
     });
   }
 
-  sendNewsletter() {
-    console.log('Sending Newsletter to all Subscribers ...');
-    const notificationPayload = {
-      title: 'Hello',
-      body: 'What is your name?',
-    };
+  // sendNewsletter() {
+  //   console.log('Sending Newsletter to all Subscribers ...');
+  //   const notificationPayload = {
+  //     title: 'Hello',
+  //     body: 'What is your name?',
+  //   };
 
-    this.webPushService.send(notificationPayload).subscribe();
-  }
+  //   this.webPushService.send(notificationPayload).subscribe();
+  // }
 
-  sendToSpecificUser() {
-    console.log('Sending Newsletter to all Subscribers ...');
-    const notificationPayload = {
-      title: 'Hello',
-      body: 'How are you?',
-    };
+  // sendToSpecificUser() {
+  //   console.log('Sending Newsletter to all Subscribers ...');
+  //   const notificationPayload = {
+  //     title: 'Hello',
+  //     body: 'How are you?',
+  //   };
 
-    this.webPushService
-      .sendToSpecificUser(notificationPayload, this.userId)
-      .subscribe();
-  }
+  //   this.webPushService
+  //     .sendToSpecificUser(notificationPayload, this.userId)
+  //     .subscribe();
+  // }
 }
