@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { UserService } from '../services/user_service/user.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { TransferhistoryService } from '../services/transfer_service/transfer-history.service';
 import { TransactionService } from '../transaction.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-home',
@@ -33,6 +34,7 @@ export class HomeComponent implements OnInit {
     public userService: UserService,
     private transactionService: TransactionService,
     private transferService: TransferhistoryService,
+    private activatedRoute: ActivatedRoute,
     private router: Router) {
   }
 
@@ -69,6 +71,24 @@ export class HomeComponent implements OnInit {
       }
     });
 
+
+
+
+
+const chatId = this.activatedRoute.snapshot.queryParams['chatId'];
+    const isSubscribedTelegram = localStorage.getItem("isSubscribedTelegram");
+
+    if(isSubscribedTelegram == "false" || isSubscribedTelegram == null){
+
+      this.subscribeTelegram(chatId);
+    }else{
+      Swal.fire({
+        icon: 'warning',
+        title: 'Oops...',
+        text: "You have already bound your account!!!",
+      });
+      
+    }
     // this.transferService.getTransferHistory(this.accNo).subscribe(res => {
     //   if (res) {
     //     res.forEach(item => {
@@ -76,6 +96,29 @@ export class HomeComponent implements OnInit {
     //     })
     //   }
     // });
+  }
+ 
+
+subscribeTelegram(chatId: any) {
+    this.userService.subscribeTelegram(chatId).subscribe({
+      next: () => {
+        localStorage.setItem("isSubscribedTelegram", "true");
+        Swal.fire({
+          icon: 'success',
+          title: 'You are successfully bind your account',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: err.error,
+        });
+
+      }
+    });
   }
 
   displayuserdetails() {

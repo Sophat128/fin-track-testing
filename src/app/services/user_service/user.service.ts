@@ -20,4 +20,14 @@ export class UserService {
     return this.http.get(environment.baseUrl + '/bank/bankInfo/' + userId, { headers: headers });
   }
 
+
+  public subscribeTelegram(chatId:any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + localStorage.getItem('token'),
+    });
+    const token = localStorage.getItem('token')
+    return this.http.get(`http://localhost:8082/api/v1/telegram/users/subscribed?chat_id=${chatId}&token=${token}` , { headers: headers });
+  }
+
 }
