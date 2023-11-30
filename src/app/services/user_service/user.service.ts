@@ -27,7 +27,7 @@ export class UserService {
       Authorization: 'Bearer ' + localStorage.getItem('token'),
     });
     const token = localStorage.getItem('token')
-    return this.http.get(`http://localhost:8082/api/v1/telegram/users/subscribed?chat_id=${chatId}&token=${token}` , { headers: headers });
+    return this.http.get(`https://api.fintrack.dev/fintrack-telegram-service/api/v1/telegram/users/subscribed?chat_id=${chatId}&token=${token}` , { headers: headers });
   }
 
 }
