@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-header',
@@ -40,6 +41,12 @@ export class HeaderComponent implements OnInit {
     localStorage.removeItem('user');
     this.isShow = !this.isShow;
     this.authService.authenticate(false);
+    Swal.fire({
+      icon: 'success',
+      title: 'Logout successfully',
+      showConfirmButton: false,
+      timer: 2000,
+    });
 
   }
 
