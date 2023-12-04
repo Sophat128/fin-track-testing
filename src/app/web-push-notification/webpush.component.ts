@@ -22,7 +22,7 @@ export class WebpushComponent {
 
   commonNotification = {
     title: 'KB Bank',
-    icon: '../assets/icons/icon-72x72.png',
+    icon: '../assets/kb_logo.png',
     vibrate: [100, 50, 100],
     data: {
       dateOfArrival: Date.now(),

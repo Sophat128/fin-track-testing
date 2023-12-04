@@ -32,6 +32,12 @@ export class HeaderComponent implements OnInit {
 
   logOut() {
     localStorage.setItem('login', 'false');
+    localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('savingAccNo');
+    localStorage.removeItem('username');
+    localStorage.removeItem('user');
     this.isShow = !this.isShow;
     this.authService.authenticate(false);
 

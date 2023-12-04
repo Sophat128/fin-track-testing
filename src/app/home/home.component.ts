@@ -17,7 +17,7 @@ export class HomeComponent implements OnInit {
   username = localStorage.getItem('username');
   private accNo = localStorage.getItem('savingAccNo');
   private bankAccountNumber = localStorage.getItem('savingAccNo');
-  savingAcc!: string;
+  savingAcc = '';
   // primaryAcc: number;
   savingBalanceLocal!: number;
   // primaryBalanceLocal: number;
@@ -43,32 +43,32 @@ export class HomeComponent implements OnInit {
       this.savingAcc = res.payload.bankAccountNumber;
       this.savingBalanceLocal = res.payload.currentBalance;
       localStorage.setItem('savingAccNo', this.savingAcc);
+
+      this.transactionService
+        .getTransactions(res.payload.bankAccountNumber)
+        .subscribe((res) => {
+          console.log('Dara res: ', res);
+
+          if (res) {
+            this.transaction.count = res.payload.length;
+            res.payload.forEach((item: any) => {
+              if (item.type == 'DEPOSIT') {
+                console.log('DEPOSIT');
+
+                this.transaction.deposit += item.amount;
+              } else if (item.type == 'WITHDRAW') {
+                console.log('WITHDRAW');
+
+                this.transaction.withdraw += item.amount;
+              } else {
+                this.transfer += item.amount;
+              }
+            });
+            this.transaction.total =
+              this.transaction.withdraw + this.transaction.deposit;
+          }
+        });
     });
-
-    this.transactionService
-      .getTransactions(this.bankAccountNumber)
-      .subscribe((res) => {
-        console.log('Dara res: ', res);
-
-        if (res) {
-          this.transaction.count = res.payload.length;
-          res.payload.forEach((item: any) => {
-            if (item.type == 'DEPOSIT') {
-              console.log('DEPOSIT');
-
-              this.transaction.deposit += item.amount;
-            } else if (item.type == 'WITHDRAW') {
-              console.log('WITHDRAW');
-
-              this.transaction.withdraw += item.amount;
-            } else {
-              this.transfer += item.amount;
-            }
-          });
-          this.transaction.total =
-            this.transaction.withdraw + this.transaction.deposit;
-        }
-      });
 
     const chatId = this.activatedRoute.snapshot.queryParams['chatId'];
     if (chatId !== undefined) {
