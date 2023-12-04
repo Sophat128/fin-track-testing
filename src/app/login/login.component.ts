@@ -62,7 +62,6 @@ export class LoginComponent implements OnInit {
   }
 
   onFormSubmit() {
-    console.log('Work');
 
     this.submitted = true;
 
@@ -74,7 +73,6 @@ export class LoginComponent implements OnInit {
 
     this.loginService.loginUser(result).subscribe({
       next: (res) => {
-        console.log('Loggin data: ', res);
 
         localStorage.setItem('token', res.loginResponse.access_token);
         localStorage.setItem('refresh_token', res.loginResponse.refresh_token);
@@ -85,12 +83,10 @@ export class LoginComponent implements OnInit {
           atob(res.loginResponse.access_token.split('.')[1])
         );
 
-        console.log('decodedToken: ', decodedToken);
 
         // Extract user information
         const userId = decodedToken.sub;
         const username = decodedToken.preferred_username;
-        console.log('username: ', username);
 
         this.authService.authenticate(true);
         this.authService.setUserName(username);
@@ -106,7 +102,6 @@ export class LoginComponent implements OnInit {
           timer: 2000,
         });
         this.router.navigate(['/home']);
-        console.log('Redirect');
         setTimeout(() => {
           this.subscribeToNotifications(userId);
         }, 3000);
@@ -114,12 +109,11 @@ export class LoginComponent implements OnInit {
         // this._router.navigate(['/beginning']);
       },
       error: (err) => {
-        console.log('Error: ', err);
 
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: err.error,
+          text: err.error.message,
         });
         this.authService.authenticate(false);
         this.loading = false;
@@ -128,22 +122,12 @@ export class LoginComponent implements OnInit {
   }
 
   subscribeToNotifications(userId:string) {
-    console.log('subscribed: ', this.subscribed);
-    console.log('UserId: ', userId);
-    // if (this.subscribed == 'true') {
-    //   Swal.fire({
-    //     icon: 'warning',
-    //     title: 'Oops...',
-    //     text: 'You have subscribed already!!!',
-    //   });
-    // }
+   
     if (this.subscribed == 'false' || this.subscribed == null) {
       this.webPushService.getPublicKey().subscribe(
         (publicKey) => {
           let data = JSON.parse(JSON.stringify(publicKey));
           this.VAPID_PUBLIC_KEY = data.payload;
-          // You can now use the publicKey in your component
-          console.log('My key: ', data.payload);
         },
         (error) => {
           console.error('Error:', error);
@@ -178,18 +162,14 @@ export class LoginComponent implements OnInit {
                     showConfirmButton: false,
                     timer: 2000,
                   });
-                  console.log('Sent push subscription object to server.');
                 },
                 (err) => {
-                  console.log(
-                    'Could not send subscription object to server, reason: ',
-                    err
-                  );
+                
 
                   Swal.fire({
                     icon: 'error',
                     title: 'Oops...',
-                    text: err.error,
+                    text: err.error.message,
                   });
                 }
               );
@@ -198,31 +178,7 @@ export class LoginComponent implements OnInit {
             }
           });
 
-          // this.webPushService.addPushSubscriber(sub, this.userId).subscribe(
-          //   () => {
-          //     this.sub = sub;
-          //     localStorage.setItem('sub', 'true');
-          //     Swal.fire({
-          //       icon: 'success',
-          //       title: 'Subscribe successfully',
-          //       showConfirmButton: false,
-          //       timer: 2000,
-          //     });
-          //     console.log('Sent push subscription object to server.');
-          //   },
-          //   (err) => {
-          //     console.log(
-          //       'Could not send subscription object to server, reason: ',
-          //       err
-          //     );
-
-          //     Swal.fire({
-          //       icon: 'error',
-          //       title: 'Oops...',
-          //       text: err.error,
-          //     });
-          //   }
-          // );
+          
         })
         .catch((err) =>
           console.error('Could not subscribe to notifications', err)

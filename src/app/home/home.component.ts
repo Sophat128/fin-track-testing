@@ -39,7 +39,6 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.userService.getUser(this.userId).subscribe((res) => {
-      console.log('res: ', res);
       this.savingAcc = res.payload.bankAccountNumber;
       this.savingBalanceLocal = res.payload.currentBalance;
       localStorage.setItem('savingAccNo', this.savingAcc);
@@ -47,7 +46,6 @@ export class HomeComponent implements OnInit {
       this.transactionService
         .getTransactions(res.payload.bankAccountNumber)
         .subscribe((res) => {
-          console.log('Dara res: ', res);
 
           if (res) {
             this.transaction.count = res.payload.length;

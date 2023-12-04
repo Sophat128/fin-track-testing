@@ -75,8 +75,6 @@ export class RegisterComponent implements OnInit {
     const result: User = Object.assign({}, this.registerForm.value);
 
     // Do useful stuff with the gathered data
-    console.log(result.firstName);
-    console.log(this.selectedOption);
 
     this.registerService
       .insertUser(
@@ -88,7 +86,6 @@ export class RegisterComponent implements OnInit {
         result.password
       )
       .subscribe((data: any) => {
-        console.log('Data: ', data.payload);
 
         this.loading = false;
         localStorage.clear();

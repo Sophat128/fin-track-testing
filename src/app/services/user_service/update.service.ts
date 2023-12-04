@@ -27,7 +27,6 @@ export class UpdateService {
       password: prevpassword,
       newpassword: newpassword,
     };
-    console.log(body);
     return this.http.put( environment.baseUrl+ '/profile/update', body);
   }
 }

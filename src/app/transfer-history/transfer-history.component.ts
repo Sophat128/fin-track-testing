@@ -33,10 +33,8 @@ export class TransferHistoryComponent implements OnInit {
       const dataList: Array<TransferHistory> = [];
       res.payload.map((transaction: any) => {
         if(transaction.type == "TRANSFER" && transaction.statementType == "EXPENSE"){
-          console.log("Date: ", transaction.createdAt);
           
           const data = new TransferHistory(transaction.id,transaction.bankAccountNumber, transaction.receivedAccountNumber,transaction.amount,new Date(transaction.createdAt).toLocaleString());
-          console.log("Data transaction: ", data);
           
           dataList.push(data);
 

@@ -20,7 +20,7 @@ export class WithdrawComponent implements OnInit {
   submitted = false;
 
   ngOnInit(): void {
-    var accNo = localStorage.getItem('savingAccNo');    
+    var accNo = localStorage.getItem('savingAccNo');
     this.withdrawForm = this.formBuilder.group({
       account: accNo,
       amount: ['', [Validators.required]],
@@ -46,20 +46,23 @@ export class WithdrawComponent implements OnInit {
     try {
       this.withdrawService
         .insertEntry(result.account, +result.amount)
-        .subscribe((data: any) => {
-          this.loading = false;
-          if (data.status == 200) {
-            
-            Swal.fire({
-              icon: 'success',
-              title: 'Transaction successful',
-              text: data.message,
-            });
-          } else {
+        .subscribe({
+          next: (data: any) => {
+            this.loading = false;
+            if (data.status == 200) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Transaction successful',
+                text: data.message,
+              });
+            }
+          },
+          error: (err) => {
+            this.loading = false;
             Swal.fire({
               icon: 'error',
               title: 'Oops...',
-              text: data.message,
+              text: err.error.message,
             });
           }
         });

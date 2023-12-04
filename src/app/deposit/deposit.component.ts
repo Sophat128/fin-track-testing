@@ -14,13 +14,13 @@ export class DepositComponent implements OnInit {
     private formBuilder: FormBuilder,
     private router: Router,
     private depositService: DepositService
-  ) { }
+  ) {}
   depositForm!: FormGroup;
   loading = false;
   submitted = false;
 
   ngOnInit(): void {
-    const accNo = localStorage.getItem('savingAccNo');    
+    const accNo = localStorage.getItem('savingAccNo');
     this.depositForm = this.formBuilder.group({
       account: accNo,
       amount: ['', [Validators.required]],
@@ -46,21 +46,34 @@ export class DepositComponent implements OnInit {
     try {
       this.depositService
         .insertEntry(result.account, +result.amount)
-        .subscribe((data: any) => {
-          this.loading = false;
-          if (data.status == 200) {
-            Swal.fire({
-              icon: 'success',
-              title: 'Transaction successful',
-              text: data.message,
-            });
-          } else {
+        .subscribe({
+          next: (data: any) => {
+            if (data.status == 200) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Transaction successful',
+                text: data.message,
+              });
+              this.loading = false;
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: data.message,
+              });
+            }
+          },
+          error: (err) => {
+            console.log('eero: ', err);
+
+            this.loading = false;
+
             Swal.fire({
               icon: 'error',
               title: 'Oops...',
-              text: data.message,
+              text: err.error.message,
             });
-          }
+          },
         });
     } catch {
       this.loading = false;

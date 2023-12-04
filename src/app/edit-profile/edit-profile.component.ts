@@ -48,9 +48,7 @@ export class EditProfileComponent implements OnInit {
     try {
       this.updateService.update(this.username, result.phone, result.email, result.address, result.prevpassword, result.password).subscribe(
         (data: any) => {
-          // localStorage.clear();
-          // localStorage.setItem('user',JSON.stringify(data));
-          console.log(data);
+         
           this.loading = false;
           if (data.flag == true) {
             Swal.fire(

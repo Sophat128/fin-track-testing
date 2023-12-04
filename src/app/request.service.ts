@@ -16,7 +16,6 @@ export class RequestService {
       account: accNo,
       no_of_pages: pages,
     };
-    console.log(body);
     return this.http.post<ChequebookResponse>(
       environment.baseUrl+ '/cheque/request',
       body

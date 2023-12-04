@@ -23,7 +23,6 @@ export class TransferService {
      
       amount: amount,
     };
-    console.log(body);
     return this.http.post(environment.baseUrl + `/transaction/transfer/${savingAccount}/${primaryAccount}`, body, { headers: headers });
   }
 }

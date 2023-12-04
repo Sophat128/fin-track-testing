@@ -37,8 +37,6 @@ export class WebpushComponent {
   };
 
   VAPID_PUBLIC_KEY = '';
-  // 'BLnVk1MBGFBW4UxL44fuoM2xxQ4o9CuxocVzKn9UVmnXZEyPCTEFjI4sALMB8qN5ee67yZ6MeQWjd5iyS8lINAg';
-  // 'BM8sBfpPla7o8yocv8HMuEWLbT7AurG20zciQfVLasrBTNPbdWW4G_6gyZdfqWkPVazJFIT3igimQRkdQZzo6fc';
 
   constructor(
     private swPush: SwPush,
@@ -57,7 +55,6 @@ export class WebpushComponent {
         let data = JSON.parse(JSON.stringify(publicKey));
         this.VAPID_PUBLIC_KEY = data.payload.publicKey;
         // You can now use the publicKey in your component
-        console.log('My key: ', data.payload.publicKey);
       },
       (error) => {
         console.error('Error:', error);
@@ -66,19 +63,16 @@ export class WebpushComponent {
   }
 
   showNotification(message: any) {
-    console.log('Before notification');
     if ('Notification' in window && Notification.permission === 'granted') {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
         navigator.serviceWorker.ready.then((registration) => {
           // Parse the JSON data received from the backend
-          console.log('message body: ', message.body);
 
           if (message.body == undefined) {
             this.notificationResponse = {
               ...this.commonNotification,
               body: message.message,
             };
-            console.log('Default working');
 
             registration.showNotification('KB Bank', this.notificationResponse);
           }
@@ -128,7 +122,6 @@ export class WebpushComponent {
   }
 
   subscribeToNotifications() {
-    console.log('subscribed: ', this.subscribed);
     if(this.subscribed == 'true') {
       Swal.fire({
         icon: 'warning',
@@ -142,7 +135,6 @@ export class WebpushComponent {
           let data = JSON.parse(JSON.stringify(publicKey));
           this.VAPID_PUBLIC_KEY = data.payload;
           // You can now use the publicKey in your component
-          console.log('My key: ', data.payload);
         },
         (error) => {
           console.error('Error:', error);
@@ -167,18 +159,14 @@ export class WebpushComponent {
                 showConfirmButton: false,
                 timer: 2000,
               });
-              console.log('Sent push subscription object to server.');
             },
             (err) => {
-              console.log(
-                'Could not send subscription object to server, reason: ',
-                err
-              );
+              
 
               Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: err.error,
+                text: err.error.message,
               });
             }
           );
@@ -204,7 +192,6 @@ export class WebpushComponent {
     const self = this;
     navigator.serviceWorker.ready.then(function (registration) {
       registration.pushManager.getSubscription().then(function (subscription) {
-        console.log('log ', subscription);
 
         if (subscription) {
           subscription.unsubscribe().then(function (success) {
@@ -246,25 +233,5 @@ export class WebpushComponent {
     });
   }
 
-  // sendNewsletter() {
-  //   console.log('Sending Newsletter to all Subscribers ...');
-  //   const notificationPayload = {
-  //     title: 'Hello',
-  //     body: 'What is your name?',
-  //   };
-
-  //   this.webPushService.send(notificationPayload).subscribe();
-  // }
-
-  // sendToSpecificUser() {
-  //   console.log('Sending Newsletter to all Subscribers ...');
-  //   const notificationPayload = {
-  //     title: 'Hello',
-  //     body: 'How are you?',
-  //   };
-
-  //   this.webPushService
-  //     .sendToSpecificUser(notificationPayload, this.userId)
-  //     .subscribe();
-  // }
+  
 }

@@ -17,14 +17,12 @@ export class WithdrawService {
       Authorization: 'Bearer ' + localStorage.getItem('token'),
     });
     let accountNumber = String(account).padStart(10, '0');
-    console.log("Account: ", accountNumber);
 
     
     const body = {
       account: account,
       amount: amount,
     };
-    console.log(body);
     return this.http.post(environment.baseUrl + '/transaction/withdraw/' + accountNumber, body, { headers: headers });
   }
 }
