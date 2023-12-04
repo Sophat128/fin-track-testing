@@ -109,11 +109,13 @@ export class LoginComponent implements OnInit {
         // this._router.navigate(['/beginning']);
       },
       error: (err) => {
+        console.log("Errro: ", err);
+        
 
         Swal.fire({
           icon: 'error',
           title: 'Oops...',
-          text: err.error.message,
+          text: err.error,
         });
         this.authService.authenticate(false);
         this.loading = false;

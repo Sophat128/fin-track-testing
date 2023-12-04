@@ -63,9 +63,13 @@ export class WebpushComponent {
   }
 
   showNotification(message: any) {
+    console.log("message: ", message);
+    
     if ('Notification' in window && Notification.permission === 'granted') {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
         navigator.serviceWorker.ready.then((registration) => {
+          console.log("Data: ", registration);
+          
           // Parse the JSON data received from the backend
 
           if (message.body == undefined) {
